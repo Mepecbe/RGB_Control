@@ -33,7 +33,7 @@ void setup() {
   pinMode(Switch_1, INPUT); //Тумблер 1
   pinMode(Switch_2, INPUT); //Тумблер 2
   
-  Serial.begin(115200);
+  Serial.begin(9600);
 
   for(byte a = 0; a < 2; a++){
     setRGB(50,0,0);

@@ -72,6 +72,8 @@
             this.ModeButton1 = new MetroFramework.Controls.MetroButton();
             this.colorWheel2 = new Cyotek.Windows.Forms.ColorWheel();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.Btn_RGBtoHSV = new MetroFramework.Controls.MetroButton();
+            this.Btn_HSVtoRGB = new MetroFramework.Controls.MetroButton();
             this.metroTabControl1.SuspendLayout();
             this.Page_StaticMode.SuspendLayout();
             this.tabPage4.SuspendLayout();
@@ -102,6 +104,8 @@
             // 
             // Page_StaticMode
             // 
+            this.Page_StaticMode.Controls.Add(this.Btn_HSVtoRGB);
+            this.Page_StaticMode.Controls.Add(this.Btn_RGBtoHSV);
             this.Page_StaticMode.Controls.Add(this.Button_V_Minus);
             this.Page_StaticMode.Controls.Add(this.Button_H_Minus);
             this.Page_StaticMode.Controls.Add(this.Button_S_Minus);
@@ -352,6 +356,7 @@
             this.V_TextBox.UseSelectable = true;
             this.V_TextBox.WaterMarkColor = System.Drawing.Color.FromArgb(((int)(((byte)(109)))), ((int)(((byte)(109)))), ((int)(((byte)(109)))));
             this.V_TextBox.WaterMarkFont = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Pixel);
+            this.V_TextBox.TextChanged += new System.EventHandler(this.V_TextBox_TextChanged);
             // 
             // V_Label
             // 
@@ -654,6 +659,26 @@
             // 
             this.timer1.Tick += new System.EventHandler(this.UpdateState_Tick);
             // 
+            // Btn_RGBtoHSV
+            // 
+            this.Btn_RGBtoHSV.Location = new System.Drawing.Point(165, 220);
+            this.Btn_RGBtoHSV.Name = "Btn_RGBtoHSV";
+            this.Btn_RGBtoHSV.Size = new System.Drawing.Size(75, 23);
+            this.Btn_RGBtoHSV.TabIndex = 29;
+            this.Btn_RGBtoHSV.Text = "RGB->HSV";
+            this.Btn_RGBtoHSV.UseSelectable = true;
+            this.Btn_RGBtoHSV.Click += new System.EventHandler(this.Btn_RGBtoHSV_Click);
+            // 
+            // Btn_HSVtoRGB
+            // 
+            this.Btn_HSVtoRGB.Location = new System.Drawing.Point(165, 190);
+            this.Btn_HSVtoRGB.Name = "Btn_HSVtoRGB";
+            this.Btn_HSVtoRGB.Size = new System.Drawing.Size(75, 23);
+            this.Btn_HSVtoRGB.TabIndex = 30;
+            this.Btn_HSVtoRGB.Text = "HSV->RGB";
+            this.Btn_HSVtoRGB.UseSelectable = true;
+            this.Btn_HSVtoRGB.Click += new System.EventHandler(this.Btn_HSVtoRGB_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -718,6 +743,8 @@
         private MetroFramework.Controls.MetroButton Button_G_Minus;
         private MetroFramework.Controls.MetroButton Button_R_Minus;
         public System.Windows.Forms.Timer timer1;
+        private MetroFramework.Controls.MetroButton Btn_HSVtoRGB;
+        private MetroFramework.Controls.MetroButton Btn_RGBtoHSV;
     }
 }
 

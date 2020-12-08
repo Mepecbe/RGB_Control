@@ -4,6 +4,7 @@ using System.IO.Ports;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Drawing;
 
 using Cyotek.Windows.Forms;
 using System.Runtime.CompilerServices;
@@ -12,18 +13,20 @@ namespace RGB_Control
 {
     public partial class Form1 : MetroFramework.Forms.MetroForm
     {
-        byte[] rgb = new byte[3]; 
+
         
         public Form1()
         {
             InitializeComponent();
 
             RGB_Control.RgbContoller.OnConnect += OnConnSuccess;
+            RGB_Control.RgbContoller.OnDisconnect += OnDisconnect;
             RGB_Control.RgbContoller.OnFailedConnect += OnFailedConnect;
 
             RGB_Control.RgbContoller.EnableProbeConnect();
         }
 
+        #region RGB Controller events
         public void OnConnSuccess()
         {
             /*МЕТОД ВЫЗЫВАЕТ ДРУГОЙ ПОТОК!!!!*/
@@ -44,31 +47,38 @@ namespace RGB_Control
             }));
         }
 
+        public void OnDisconnect()
+        {
+
+        }
+        #endregion
+        #region Form events
+
         private void SetButton_Click(object sender, EventArgs e)
         {
-            rgb = new byte[]{
-                colorWheel1.Color.R,
-                colorWheel1.Color.G,
-                colorWheel1.Color.B  
-            };
-
             RGB_Control
                 .RgbContoller
                      .SetRgb(
-                            colorWheel1.Color.R,
-                            colorWheel1.Color.G,
-                            colorWheel1.Color.B
+                            Convert.ToByte(R_TextBox.Text),
+                            Convert.ToByte(G_TextBox.Text),
+                            Convert.ToByte(B_TextBox.Text)
                      );
         }
 
         private void metroButton1_Click(object sender, EventArgs e)
         {
-            RGB_Control.RgbContoller.AddBrightness();
+            //Яркость +
+            this.V_TextBox.Text = (Convert.ToDouble(this.V_TextBox.Text) + 0.1d).ToString();
+            Btn_HSVtoRGB_Click(null, null);
+            SetButton_Click(null, null);
         }
 
         private void metroButton2_Click(object sender, EventArgs e)
         {
-            RGB_Control.RgbContoller.SubBrightness();
+            //Яркость -
+            this.V_TextBox.Text = (Convert.ToDouble(this.V_TextBox.Text) - 0.1d).ToString();
+            Btn_HSVtoRGB_Click(null, null);
+            SetButton_Click(null, null);
         }
 
         private void Shutdown_Click(object sender, EventArgs e)
@@ -99,42 +109,45 @@ namespace RGB_Control
             {
                 case 'R':
                     {
-                        RGB_Control.RgbContoller.R++;
+                        this.R_TextBox.Text = (Convert.ToInt32(this.R_TextBox.Text) + 1).ToString();
+                        colorWheel1.Color = Color.FromArgb(Convert.ToInt32(R_TextBox.Text), Convert.ToInt32(G_TextBox.Text), Convert.ToInt32(B_TextBox.Text));
                         break;
                     }
 
                 case 'G':
                     {
-                        RGB_Control.RgbContoller.G++;
+                        this.G_TextBox.Text = (Convert.ToInt32(this.G_TextBox.Text) + 1).ToString();
+                        colorWheel1.Color = Color.FromArgb(Convert.ToInt32(R_TextBox.Text), Convert.ToInt32(G_TextBox.Text), Convert.ToInt32(B_TextBox.Text));
                         break;
                     }
 
                 case 'B':
                     {
-                        RGB_Control.RgbContoller.B++;
+                        this.B_TextBox.Text = (Convert.ToInt32(this.B_TextBox.Text) + 1).ToString();
+                        colorWheel1.Color = Color.FromArgb(Convert.ToInt32(R_TextBox.Text), Convert.ToInt32(G_TextBox.Text), Convert.ToInt32(B_TextBox.Text));
                         break;
                     }
 
                 case 'H':
                     {
-                        RGB_Control.RgbContoller.H++;
+                        this.H_TextBox.Text = (Convert.ToDouble(this.H_TextBox.Text) + 0.1d).ToString();
                         break;
                     }
 
                 case 'S':
                     {
-                        RGB_Control.RgbContoller.S++;
+                        this.S_TextBox.Text = (Convert.ToDouble(this.S_TextBox.Text) + 0.1d).ToString();
                         break;
                     }
 
                 case 'V':
                     {
-                        RGB_Control.RgbContoller.V++;
+                        this.V_TextBox.Text = (Convert.ToDouble(this.V_TextBox.Text) + 0.1d).ToString();
                         break;
                     }
             }
 
-            UpdateRGBHSV_Values();
+            
         }
 
         private void RGBHSV_MINUS(object sender, EventArgs e)
@@ -143,59 +156,118 @@ namespace RGB_Control
             {
                 case 'R':
                     {
-                        RGB_Control.RgbContoller.R--;
+                        this.R_TextBox.Text = (Convert.ToInt32(this.R_TextBox.Text) - 1).ToString();
+                        colorWheel1.Color = Color.FromArgb(Convert.ToInt32(R_TextBox.Text), Convert.ToInt32(G_TextBox.Text), Convert.ToInt32(B_TextBox.Text));
                         break;
                     }
 
                 case 'G':
                     {
-                        RGB_Control.RgbContoller.G--;
+                        this.G_TextBox.Text = (Convert.ToInt32(this.G_TextBox.Text) - 1).ToString();
+                        colorWheel1.Color = Color.FromArgb(Convert.ToInt32(R_TextBox.Text), Convert.ToInt32(G_TextBox.Text), Convert.ToInt32(B_TextBox.Text));
                         break;
                     }
 
                 case 'B':
                     {
-                        RGB_Control.RgbContoller.B--;
+                        this.B_TextBox.Text = (Convert.ToInt32(this.B_TextBox.Text) - 1).ToString();
+                        colorWheel1.Color = Color.FromArgb(Convert.ToInt32(R_TextBox.Text), Convert.ToInt32(G_TextBox.Text), Convert.ToInt32(B_TextBox.Text));
                         break;
                     }
 
                 case 'H':
                     {
-                        RGB_Control.RgbContoller.H--;
+                        this.H_TextBox.Text = (Convert.ToDouble(this.H_TextBox.Text) - 0.1d).ToString();
                         break;
                     }
 
                 case 'S':
                     {
-                        RGB_Control.RgbContoller.S--;
+                        this.S_TextBox.Text = (Convert.ToDouble(this.S_TextBox.Text) - 0.1d).ToString();
                         break;
                     }
 
                 case 'V':
                     {
-                        RGB_Control.RgbContoller.V--;
+                        this.V_TextBox.Text = (Convert.ToDouble(this.V_TextBox.Text) - 0.1d).ToString();
                         break;
                     }
             }
-
-            UpdateRGBHSV_Values();
         }
+        #endregion
 
-        public void UpdateRGBHSV_Values()
-        {
-            this.R_TextBox.Text = RGB_Control.RgbContoller.R.ToString();
-            this.G_TextBox.Text = RGB_Control.RgbContoller.G.ToString();
-            this.B_TextBox.Text = RGB_Control.RgbContoller.B.ToString();
-            this.H_TextBox.Text = RGB_Control.RgbContoller.H.ToString();
-            this.S_TextBox.Text = RGB_Control.RgbContoller.S.ToString();
-            this.V_TextBox.Text = RGB_Control.RgbContoller.V.ToString();
-        }
 
         private void UpdateState_Tick(object sender, EventArgs e)
         {
             this.Switch1.Text = RGB_Control.RgbContoller.Switch1.ToString();
             this.Switch2.Text = RGB_Control.RgbContoller.Switch2.ToString();
             this.RezistorValue.Text = RGB_Control.RgbContoller.Fotorezistor1.ToString();
+        }
+
+        private void RGB_TextChanged(object sender, EventArgs e)
+        {
+            MessageBox.Show("RGB to HSV");
+
+            
+        }
+
+        private void HSV_TextChanged(object sender, EventArgs e)
+        {
+            MessageBox.Show("HSV to rgb");
+
+            
+        }
+
+        private void Btn_RGBtoHSV_Click(object sender, EventArgs e)
+        {
+            double H = 0;
+            double S = 0;
+            double V = 0;
+
+            RGB_Control
+                .ColorConverter
+                .RgbToHSV(
+                    Convert.ToByte(R_TextBox.Text),
+                    Convert.ToByte(G_TextBox.Text),
+                    Convert.ToByte(B_TextBox.Text),
+                    out H,
+                    out S,
+                    out V
+                );
+
+            this.H_TextBox.Text = H.ToString();
+            this.S_TextBox.Text = S.ToString();
+            this.V_TextBox.Text = V.ToString();
+        }
+
+        private void Btn_HSVtoRGB_Click(object sender, EventArgs e)
+        {
+            int r = 0;
+            int g = 0;
+            int b = 0;
+
+            RGB_Control
+                .ColorConverter
+                .HsvToRgb(
+                    Convert.ToDouble(H_TextBox.Text),
+                    Convert.ToDouble(S_TextBox.Text),
+                    Convert.ToDouble(V_TextBox.Text),
+                    out r, out g, out b
+                );
+
+            this.R_TextBox.Text = r.ToString();
+            this.G_TextBox.Text = g.ToString();
+            this.B_TextBox.Text = b.ToString();
+
+            this.colorWheel1.Color = Color.FromArgb(r, g, b);
+        }
+
+        private void V_TextBox_TextChanged(object sender, EventArgs e)
+        {
+            if(Convert.ToDouble(V_TextBox.Text) >= 1d)
+            {
+                V_TextBox.Text = 1d.ToString();
+            }
         }
     }
 }

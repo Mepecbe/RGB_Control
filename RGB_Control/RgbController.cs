@@ -120,25 +120,25 @@ namespace RGB_Control
                 return i;
             }
 
-
+            public static void RgbToHSV(byte r, byte g, byte b, out double H, out double S, out double V)
+            {
+                Color color = Color.FromArgb(r, b, g);
+                H = color.GetHue();
+                S = color.GetSaturation();
+                V = color.GetBrightness();
+            }
 
         }
 
         public static class RgbContoller
         {
+            public static Color ActiveColor;
             public static event Action OnConnect;
             public static event Action OnDisconnect;
             public static event Action OnFailedConnect;
 
-            public static SerialPort Serial = new SerialPort("COM5", 115200);
-
-            public static byte R { get; set; }
-            public static byte G { get; set; }
-            public static byte B { get; set; }
-            public static byte H { get; set; }
-            public static byte S { get; set; }
-            public static byte V { get; set; }
-
+            public static SerialPort Serial = new SerialPort("COM5", 9600);
+            
             public static byte Switch1 { get; private set; }
             public static byte Switch2 { get; private set; }
             public static byte Fotorezistor1 { get; private set; }
@@ -179,8 +179,8 @@ namespace RGB_Control
 
             public static void SetRgb(byte r, byte g, byte b, bool SaveInEeprom = false)
             {
-                R = r; G = g; B = b;
-
+                ActiveColor = Color.FromArgb(r, g, b);
+                
                 if (SaveInEeprom)
                 {
                     Serial.Write(new byte[] { 1, r, g, b }, 0, 4);
@@ -189,17 +189,6 @@ namespace RGB_Control
                 {
                     Serial.Write(new byte[] { 0, r, g, b }, 0, 4);
                 }
-            }
-
-
-            public static void AddBrightness()
-            {
-                SetRgb(++R, ++B, ++G);
-            }
-
-            public static void SubBrightness()
-            {
-                SetRgb(--R, --B, --G);
             }
         }
 
@@ -273,7 +262,6 @@ namespace RGB_Control
                 Thread.Sleep(500);
 
                 //Плавное снижение яркости
-
                 while (r > 0 || g > 0 || b > 0)
                 {
                     if (r > 0)
