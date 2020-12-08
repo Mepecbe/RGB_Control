@@ -1,3 +1,18 @@
+/*
+    Контроллер всегда шлёт в порт данные вида:
+        S1 S2 F1 где: 
+            S1 - состояние тумблера 1 (0 или 1)
+            S2 - состояние тумблера 2 (0 или 1)
+            F1 - состояние фоторезистора (0 - 255) 
+
+    Доступные команды(приём через сериал порт с Baud rate = 9600), каждый операнд - 1 байт
+        0 R G B - установить цвета r, g, b
+        1 R G B - установить цвета r, g, b и записать их в EEPROM
+        
+
+*/
+
+
 #define RED_PIN   9
 #define GREEN_PIN 11
 #define BLUE_PIN  10
@@ -35,15 +50,24 @@ void loop(){
     byte packetId = Serial.read();
 
     switch(packetId){
+      case 0:{
+        Serial.readBytes(rgb, 3);
+        setRGB(rgb[0], rgb[1], rgb[2]);
+
+        break;
+      }
+
       case 1:{
         Serial.readBytes(rgb, 3);
         setRGB(rgb[0], rgb[1], rgb[2]);
 
-        for(int a = 0; a < 3; a++)
-          eeprom_write_byte(a, rgb[a]);
+        for(int ByteIndex = 0; ByteIndex < 3; ByteIndex++)
+          eeprom_write_byte(ByteIndex, rgb[ByteIndex]);
         
         break;
       }
+
+      
     }
   }
 
