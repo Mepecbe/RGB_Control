@@ -21,6 +21,14 @@
 byte rgb[] = {0,0,0};
 
 void setup() {
+  // Пины D9 и D10 - 4 кГц
+  TCCR1A = 0b00000001;  // 8bit
+  TCCR1B = 0b00000010;  // x8 phase correct
+
+  // Пины D3 и D11 - 4 кГц
+  TCCR2B = 0b00000010;  // x8
+  TCCR2A = 0b00000001;  // phase correct
+   
   // put your setup code here, to run once:
   pinMode(RED_PIN, OUTPUT);
   pinMode(GREEN_PIN, OUTPUT);
@@ -68,7 +76,11 @@ void loop(){
       case 2:{
         Serial.write(digitalRead(Switch_1));
         Serial.write(digitalRead(Switch_2));
-        Serial.write(analogRead(FotoRezistor));
+        int val1 = analogRead(FotoRezistor);
+        delay(10);
+        int val2 = analogRead(FotoRezistor);
+        delay(10);        
+        Serial.write((analogRead(FotoRezistor) + val1 + val2) / 3);
       }     
     }
   }

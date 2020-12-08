@@ -42,7 +42,7 @@ namespace RGB_Control
             /*МЕТОД ВЫЗЫВАЕТ ДРУГОЙ ПОТОК!!!!*/
             this.BeginInvoke(new Action(() =>
             {
-                Label_State.Text = "НЕ ПОДКЛЮЧЕН(ОШИБКА)";
+                Label_State.Text = "НЕ ПОДКЛЮЧЕН\n(ОШИБКА)";
                 this.timer1.Enabled = false;
             }));
         }
@@ -200,25 +200,10 @@ namespace RGB_Control
         private void UpdateState_Tick(object sender, EventArgs e)
         {
             RGB_Control.RgbContoller.GetState();
-            Thread.Sleep(10);
 
             this.Switch1.Text = RGB_Control.RgbContoller.Switch1.ToString();
             this.Switch2.Text = RGB_Control.RgbContoller.Switch2.ToString();
             this.RezistorValue.Text = RGB_Control.RgbContoller.Fotorezistor1.ToString();
-        }
-
-        private void RGB_TextChanged(object sender, EventArgs e)
-        {
-            MessageBox.Show("RGB to HSV");
-
-            
-        }
-
-        private void HSV_TextChanged(object sender, EventArgs e)
-        {
-            MessageBox.Show("HSV to rgb");
-
-            
         }
 
         private void Btn_RGBtoHSV_Click(object sender, EventArgs e)
