@@ -26,13 +26,22 @@ namespace RGB_Control
 
         public void OnConnSuccess()
         {
-            Label_State.Text = "ПОДКЛЮЧЕН";
-            this.timer1.Enabled = true;
+            /*МЕТОД ВЫЗЫВАЕТ ДРУГОЙ ПОТОК!!!!*/
+            this.BeginInvoke(new Action(() =>
+            {
+                Label_State.Text = "ПОДКЛЮЧЕН";
+                this.timer1.Enabled = true;
+            }));
         }
 
         public void OnFailedConnect()
         {
-            Label_State.Text = "НЕ ПОДКЛЮЧЕН(ОШИБКА)";
+            /*МЕТОД ВЫЗЫВАЕТ ДРУГОЙ ПОТОК!!!!*/
+            this.BeginInvoke(new Action(() =>
+            {
+                Label_State.Text = "НЕ ПОДКЛЮЧЕН(ОШИБКА)";
+                this.timer1.Enabled = false;
+            }));
         }
 
         private void SetButton_Click(object sender, EventArgs e)
@@ -70,6 +79,7 @@ namespace RGB_Control
         private void metroButton4_Click(object sender, EventArgs e)
         {
             //Режим 1
+            RGB_Control.Mode1.Enable(20);
         }
 
         private void colorWheel1_ColorChanged(object sender, EventArgs e)

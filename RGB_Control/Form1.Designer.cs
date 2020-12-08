@@ -717,7 +717,7 @@
         private MetroFramework.Controls.MetroButton Button_B_Minus;
         private MetroFramework.Controls.MetroButton Button_G_Minus;
         private MetroFramework.Controls.MetroButton Button_R_Minus;
-        private System.Windows.Forms.Timer timer1;
+        public System.Windows.Forms.Timer timer1;
     }
 }
 

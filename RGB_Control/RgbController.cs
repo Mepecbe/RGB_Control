@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using System.ComponentModel;
 
 using System.IO.Ports;
 
@@ -129,7 +130,7 @@ namespace RGB_Control
             public static event Action OnDisconnect;
             public static event Action OnFailedConnect;
 
-            public static SerialPort Serial = new SerialPort("COM5", 9600);
+            public static SerialPort Serial = new SerialPort("COM5", 115200);
 
             public static byte R { get; set; }
             public static byte G { get; set; }
@@ -152,7 +153,6 @@ namespace RGB_Control
                         {
                             Serial.DataReceived += OnReceive;
                             Serial.Open();
-                            
                             OnConnect?.Invoke();
 
                             break;
@@ -175,8 +175,6 @@ namespace RGB_Control
                 Switch1 = buff[0];
                 Switch2 = buff[1];
                 Fotorezistor1 = buff[2];
-
-                Debug.WriteLine("[Serial] OnReceive ");
             }
 
             public static void SetRgb(byte r, byte g, byte b, bool SaveInEeprom = false)
@@ -196,11 +194,7 @@ namespace RGB_Control
 
             public static void AddBrightness()
             {
-                //ColorConverter.
-
-
-
-                //SetRgb(++R, ++B, ++G);
+                SetRgb(++R, ++B, ++G);
             }
 
             public static void SubBrightness()
@@ -214,37 +208,96 @@ namespace RGB_Control
         {
             private static int[,] colors = new int[,]
             {
-                { 100, 0, 000  }, //Красный
-                { 100, 50, 000  }, //Оранжевый
-                { 100, 100, 000  }, // Желтный
-                { 000, 100, 000  }, //Зеленый
-                { 000, 000, 100  }, //Синий
+                { 255, 0, 000  }, //Красный
+                //{ 100, 50, 000  }, //Оранжевый
+                //{ 100, 100, 000  }, // Желтный
+                { 000, 255, 000  }, //Зеленый
+                { 000, 000, 255  }, //Синий
             };
 
             private static Random rnd = new Random();
             private static Task active;
             private static int sleep;
+            private static int prevColor;
 
             public static void Enable(int AnimationDuration)
             {
                 sleep = AnimationDuration;
+
+                active = new Task(() => task());
+                active.Start();
             }
 
             private static void task()
             {
-                int r = 0, g = 0, b = 0;
-                int color = rnd.Next(0, colors.Length);
+                Thread.Sleep(500);
 
-                for (;
-                    r < colors[color, 0] &&
-                    g < colors[color, 1] &&
-                    b < colors[color, 2];
+                byte r = 0, g = 0, b = 0;
+                int color = rnd.Next(0, colors.GetUpperBound(0) + 1);
 
-                    r++, g++, b++)
+                while (color == prevColor)
                 {
+                    color = rnd.Next(0, colors.GetUpperBound(0) + 1);
+                }
+
+                prevColor = color;
+
+                Debug.WriteLine($"Выбран цвет {color} => {colors[color, 0]}, {colors[color, 1]}, {colors[color, 2]} ");
+
+                //Плавное "увеличение яркости"
+                while (r <= colors[color, 0] || g <= colors[color, 1] || b <= colors[color, 2])
+                {
+                    if (r <= colors[color, 0])
+                    {
+                        r++;
+                    }
+
+                    if (g <= colors[color, 1])
+                    {
+                        g++;
+                    }
+
+                    if(b <= colors[color, 2])
+                    {
+                        b++;
+                    }
+
                     Thread.Sleep(sleep);
 
+                    RGB_Control.RgbContoller.SetRgb(r, g, b);
+                    Debug.WriteLine($"[UP] Установлен цвет {r}, {g}, {b}");
                 }
+
+                Thread.Sleep(500);
+
+                //Плавное снижение яркости
+
+                while (r > 0 || g > 0 || b > 0)
+                {
+                    if (r > 0)
+                    {
+                        r--;
+                    }
+
+                    if (g > 0)
+                    {
+                        g--;
+                    }
+
+                    if (b > 0)
+                    {
+                        b--;
+                    }
+
+                    Thread.Sleep(sleep);
+
+                    RGB_Control.RgbContoller.SetRgb(r, g, b);
+                    Debug.WriteLine($"[DOWN] Установлен цвет {r}, {g}, {b}");
+                }
+
+
+                active = new Task(task);
+                active.Start();
             }
         }
     }
