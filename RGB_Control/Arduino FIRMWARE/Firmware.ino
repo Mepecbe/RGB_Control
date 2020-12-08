@@ -75,7 +75,7 @@ void loop(){
   Serial.write(digitalRead(Switch_2));
   Serial.write(analogRead(FotoRezistor));
 
-  delay(100);
+  delay(10);
 }
 
 void setRGB(byte r, byte g, byte b){

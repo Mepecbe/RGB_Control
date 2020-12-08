@@ -79,7 +79,7 @@ namespace RGB_Control
         private void metroButton4_Click(object sender, EventArgs e)
         {
             //Режим 1
-            RGB_Control.Mode1.Enable(20);
+            RGB_Control.Mode1.Enable(3);
         }
 
         private void colorWheel1_ColorChanged(object sender, EventArgs e)

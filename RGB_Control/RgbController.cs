@@ -206,13 +206,13 @@ namespace RGB_Control
 
         public static class Mode1
         {
-            private static int[,] colors = new int[,]
+            private static byte[,] colors = new byte[,]
             {
-                { 255, 0, 000  }, //Красный
+                { 254, 1, 1  }, //Красный
                 //{ 100, 50, 000  }, //Оранжевый
                 //{ 100, 100, 000  }, // Желтный
-                { 000, 255, 000  }, //Зеленый
-                { 000, 000, 255  }, //Синий
+                { 1, 254, 1  }, //Зеленый
+                { 1, 1, 1  }, //Синий
             };
 
             private static Random rnd = new Random();
@@ -267,6 +267,8 @@ namespace RGB_Control
                     RGB_Control.RgbContoller.SetRgb(r, g, b);
                     Debug.WriteLine($"[UP] Установлен цвет {r}, {g}, {b}");
                 }
+
+                Debug.WriteLine($"ENDDD ");
 
                 Thread.Sleep(500);
 
