@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 using Cyotek.Windows.Forms;
+using System.Runtime.CompilerServices;
 
 namespace RGB_Control
 {
@@ -18,33 +19,13 @@ namespace RGB_Control
         {
             InitializeComponent();
 
-            try
-            {
-                Serial.Open();
-                Label_State.Text = "ПОДКЛЮЧЕН";
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Ошибка открытия порта\n " + ex.Message);
+            RGB_Control.RgbContoller.OnConnect += OnConnSuccess;
+            RGB_Control.RgbContoller.EnableProbeConnect();
+        }
 
-                new Task(() => 
-                {
-                    while (true) {
-                        try
-                        {
-                            Serial.Open();
-                            Label_State.Text = "ПОДКЛЮЧЕН";
-                            break;
-                        } 
-                        catch 
-                        {
-
-                        }
-
-                        Thread.Sleep(TimeSpan.FromSeconds(3));
-                    }
-                }).Start();
-            }
+        public void OnConnSuccess()
+        {
+            Label_State.Text = "ПОДКЛЮЧЕН";
         }
 
         private void SetButton_Click(object sender, EventArgs e)
@@ -54,8 +35,8 @@ namespace RGB_Control
                 colorWheel1.Color.G,
                 colorWheel1.Color.B  
             };
-            
-            Serial.Write(rgb, 0, 3);
+
+            Serial.Write(new byte[] { 1, rgb[0], rgb[1], rgb[2] }, 0, 4);
         }
 
         private void metroButton1_Click(object sender, EventArgs e)
@@ -72,8 +53,7 @@ namespace RGB_Control
             if (rgb[2] + 10 <= 255)
                 rgb[2] += value;
 
-
-            Serial.Write(rgb, 0, 3);
+            Serial.Write(new byte[] { 1, rgb[0], rgb[1], rgb[2] }, 0, 4);
         }
 
         private void metroButton2_Click(object sender, EventArgs e)
@@ -90,7 +70,7 @@ namespace RGB_Control
             if (rgb[2] > 0)
                 rgb[2] -= value;
 
-            Serial.Write(rgb, 0, 3);
+            Serial.Write(new byte[] { 1, rgb[0], rgb[1], rgb[2] }, 0, 4);
         }
 
         private void metroButton3_Click(object sender, EventArgs e)
@@ -123,7 +103,107 @@ namespace RGB_Control
                                 $" g {rgb[1]}\n" +
                                 $" b {rgb[2]}");
 
-                Serial.Write(rgb, 0, 3);
+                Serial.Write(new byte[] { 1, rgb[0], rgb[1], rgb[2] }, 0, 4);
+            }
+        }
+
+
+        private void OnReceive(object sender, SerialDataReceivedEventArgs e)
+        {
+            byte[] buff = new byte[3] { 0, 0, 0 };
+            Serial.Read(buff, 0, 3);
+
+            Switch1.Text       = buff[0].ToString();
+            Switch2.Text       = buff[1].ToString();
+            RezistorValue.Text = buff[2].ToString();
+        }
+
+        private void Shutdown_Click(object sender, EventArgs e)
+        {
+            Serial.Write(new byte[] { 1, 0, 0, 0 }, 0, 4);
+        }
+
+        private void metroButton4_Click(object sender, EventArgs e)
+        {
+            //Режим 1
+        }
+    }
+
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    static class RGB_Control
+    {
+        public static class RgbContoller
+        {
+            public static event Action OnConnect;
+            public static event Action OnDisconnect;
+            public static event Action OnFailedConnect;
+
+            public static SerialPort Serial = new SerialPort("COM5", 9600);
+
+            public static void EnableProbeConnect()
+            {
+                new Task(() =>
+                {
+                    while (true)
+                    {
+                        try
+                        {
+                            Serial.Open();
+                            OnDisconnect?.Invoke();
+                            break;
+                        }
+                        catch
+                        {
+                            OnFailedConnect?.Invoke();
+                        }
+
+                        Thread.Sleep(TimeSpan.FromSeconds(3));
+                    }
+                }).Start();
+            }
+        }
+
+
+        public static class Mode1
+        {
+            private static int[,] colors = new int[,] 
+            {  
+                { 100, 0, 000  }, //Красный
+                { 100, 50, 000  }, //Оранжевый
+                { 100, 100, 000  }, // Желтный
+                { 000, 100, 000  }, //Зеленый
+                { 000, 000, 100  }, //Синий
+            };
+
+            private static Random rnd = new Random();
+            private static Task active;
+            private static int sleep;
+
+            public static void Enable(int AnimationDuration)
+            {
+                sleep = AnimationDuration;
+            }
+
+
+            private static void task()
+            {
+                int r = 0, g = 0, b = 0;
+                int color = rnd.Next(0, colors.Length);
+
+                for (;
+                    r < colors[color, 0] &&
+                    g < colors[color, 1] &&
+                    b < colors[color, 2]; 
+                    
+                    r++, g++, b++)
+                {
+                    Thread.Sleep(sleep);
+
+                }
             }
         }
     }
