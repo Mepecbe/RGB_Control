@@ -199,6 +199,9 @@ namespace RGB_Control
 
         private void UpdateState_Tick(object sender, EventArgs e)
         {
+            RGB_Control.RgbContoller.GetState();
+            Thread.Sleep(10);
+
             this.Switch1.Text = RGB_Control.RgbContoller.Switch1.ToString();
             this.Switch2.Text = RGB_Control.RgbContoller.Switch2.ToString();
             this.RezistorValue.Text = RGB_Control.RgbContoller.Fotorezistor1.ToString();

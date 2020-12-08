@@ -1,15 +1,13 @@
 /*
-    Контроллер всегда шлёт в порт данные вида:
-        S1 S2 F1 где: 
-            S1 - состояние тумблера 1 (0 или 1)
-            S2 - состояние тумблера 2 (0 или 1)
-            F1 - состояние фоторезистора (0 - 255) 
-
     Доступные команды(приём через сериал порт с Baud rate = 9600), каждый операнд - 1 байт
         0 R G B - установить цвета r, g, b
         1 R G B - установить цвета r, g, b и записать их в EEPROM
-        
-
+        3 - запрос информации о состоянии тумблеров и фоторезистора
+            Микроконтроллер отвечает в порт 3-мя байтами:
+            S1 S2 F1 где: 
+              S1 - состояние тумблера 1 (0 или 1)
+              S2 - состояние тумблера 2 (0 или 1)
+              F1 - состояние фоторезистора (0 - 255) 
 */
 
 
@@ -67,15 +65,13 @@ void loop(){
         break;
       }
 
-      
+      case 2:{
+        Serial.write(digitalRead(Switch_1));
+        Serial.write(digitalRead(Switch_2));
+        Serial.write(analogRead(FotoRezistor));
+      }     
     }
   }
-
-  Serial.write(digitalRead(Switch_1));
-  Serial.write(digitalRead(Switch_2));
-  Serial.write(analogRead(FotoRezistor));
-
-  delay(10);
 }
 
 void setRGB(byte r, byte g, byte b){

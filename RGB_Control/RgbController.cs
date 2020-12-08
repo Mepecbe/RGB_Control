@@ -143,6 +143,9 @@ namespace RGB_Control
             public static byte Switch2 { get; private set; }
             public static byte Fotorezistor1 { get; private set; }
 
+            /// <summary>
+            /// Включить попытки подключения к RGB контроллеру через Serial порт
+            /// </summary>
             public static void EnableProbeConnect()
             {
                 new Task(() =>
@@ -167,6 +170,11 @@ namespace RGB_Control
                 }).Start();
             }
 
+            /// <summary>
+            /// Функция события, срабатывает при приходе данных в сериал порт
+            /// </summary>
+            /// <param name="sender"></param>
+            /// <param name="e"></param>
             private static void OnReceive(object sender, SerialDataReceivedEventArgs e)
             {
                 byte[] buff = new byte[3];
@@ -177,6 +185,13 @@ namespace RGB_Control
                 Fotorezistor1 = buff[2];
             }
 
+            /// <summary>
+            /// Установить RGB цвет ленты.
+            /// </summary>
+            /// <param name="r">Красный.</param>
+            /// <param name="g">Зелёный.</param>
+            /// <param name="b">Синий.</param>
+            /// <param name="SaveInEeprom"></param>
             public static void SetRgb(byte r, byte g, byte b, bool SaveInEeprom = false)
             {
                 ActiveColor = Color.FromArgb(r, g, b);
@@ -190,6 +205,14 @@ namespace RGB_Control
                     Serial.Write(new byte[] { 0, r, g, b }, 0, 4);
                 }
             }
+
+            /// <summary>
+            /// Отправить запрос на получение состояния тумблеров и фоторезистора
+            /// </summary>
+            public static void GetState()
+            {
+                Serial.Write(new byte[] { 2 }, 0, 1);
+            }
         }
 
 
@@ -201,7 +224,7 @@ namespace RGB_Control
                 //{ 100, 50, 000  }, //Оранжевый
                 //{ 100, 100, 000  }, // Желтный
                 { 1, 254, 1  }, //Зеленый
-                { 1, 1, 1  }, //Синий
+                { 1, 1, 255  }, //Синий
             };
 
             private static Random rnd = new Random();
