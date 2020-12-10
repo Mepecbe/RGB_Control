@@ -137,7 +137,7 @@ namespace RGB_Control
             public static event Action OnDisconnect;
             public static event Action OnFailedConnect;
 
-            public static SerialPort Serial = new SerialPort("COM5", 9600);
+            public static SerialPort Serial = new SerialPort("COM3", 9600);
             
             public static byte Switch1 { get; private set; }
             public static byte Switch2 { get; private set; }
@@ -231,86 +231,82 @@ namespace RGB_Control
             private static Task active;
             private static int sleep;
             private static int prevColor;
+            public static bool Enabled;
 
             public static void Enable(int AnimationDuration)
             {
                 sleep = AnimationDuration;
+                Enabled = true;
 
                 active = new Task(() => task());
                 active.Start();
             }
 
-            private static void task()
+            private static async void task()
             {
-                Thread.Sleep(500);
-
-                byte r = 0, g = 0, b = 0;
-                int color = rnd.Next(0, colors.GetUpperBound(0) + 1);
-
-                while (color == prevColor)
+                while (Enabled)
                 {
-                    color = rnd.Next(0, colors.GetUpperBound(0) + 1);
+                    int color = rnd.Next(0, colors.GetUpperBound(0) + 1);
+
+                    while (color == prevColor)
+                    {
+                        color = rnd.Next(0, colors.GetUpperBound(0) + 1);
+                    }
+
+                    prevColor = color;
+
+                    byte r = 0, g = 0, b = 0;
+                    int IterationCount = 255;
+                    decimal step_r = Math.Ceiling(colors[color, 0] / (decimal)IterationCount),
+                          step_g = Math.Ceiling(colors[color, 1] / (decimal)IterationCount),
+                          step_b = Math.Ceiling(colors[color, 2] / (decimal)IterationCount);
+
+                    for (int iter = 0; iter <= IterationCount; iter++)
+                    {
+                        if (r < colors[color, 0])
+                        {
+                            r += (byte)step_r;
+                        }
+
+                        if (g < colors[color, 1])
+                        {
+                            g += (byte)step_g;
+                        }
+
+                        if (b < colors[color, 2])
+                        {
+                            b += (byte)step_b;
+                        }
+
+                        RGB_Control.RgbContoller.SetRgb(Convert.ToByte(r), Convert.ToByte(g), Convert.ToByte(b));
+
+                        Thread.Sleep(sleep);
+                    }
+
+                    Thread.Sleep(500);
+
+                    for (int iter = IterationCount; iter > 0; iter--)
+                    {
+                        if (r > 0)
+                        {
+                            r -= (byte)step_r;
+                        }
+
+                        if (g > 0)
+                        {
+                            g -= (byte)step_g;
+                        }
+
+                        if (b > 0)
+                        {
+                            b -= (byte)step_b;
+                        }
+
+                        RGB_Control.RgbContoller.SetRgb(Convert.ToByte(r), Convert.ToByte(g), Convert.ToByte(b));
+
+                        Thread.Sleep(sleep);
+                    }
                 }
-
-                prevColor = color;
-
-                Debug.WriteLine($"Выбран цвет {color} => {colors[color, 0]}, {colors[color, 1]}, {colors[color, 2]} ");
-
-                //Плавное "увеличение яркости"
-                while (r <= colors[color, 0] || g <= colors[color, 1] || b <= colors[color, 2])
-                {
-                    if (r <= colors[color, 0])
-                    {
-                        r++;
-                    }
-
-                    if (g <= colors[color, 1])
-                    {
-                        g++;
-                    }
-
-                    if(b <= colors[color, 2])
-                    {
-                        b++;
-                    }
-
-                    Thread.Sleep(sleep);
-
-                    RGB_Control.RgbContoller.SetRgb(r, g, b);
-                    Debug.WriteLine($"[UP] Установлен цвет {r}, {g}, {b}");
-                }
-
-                Debug.WriteLine($"ENDDD ");
-
-                Thread.Sleep(500);
-
-                //Плавное снижение яркости
-                while (r > 0 || g > 0 || b > 0)
-                {
-                    if (r > 0)
-                    {
-                        r--;
-                    }
-
-                    if (g > 0)
-                    {
-                        g--;
-                    }
-
-                    if (b > 0)
-                    {
-                        b--;
-                    }
-
-                    Thread.Sleep(sleep);
-
-                    RGB_Control.RgbContoller.SetRgb(r, g, b);
-                    Debug.WriteLine($"[DOWN] Установлен цвет {r}, {g}, {b}");
-                }
-
-
-                active = new Task(task);
-                active.Start();
             }
         }
     }
